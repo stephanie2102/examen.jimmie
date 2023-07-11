@@ -1,0 +1,58 @@
+import random
+
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+
+def extended_gcd(a, b):
+    if a == 0:
+        return b, 0, 1
+    else:
+        gcd, x, y = extended_gcd(b % a, a)
+        return gcd, y - (b // a) * x, x
+
+def generate_prime():
+    primes = []
+    for num in range(1000, 10000):
+        if all(num % i != 0 for i in range(2, int(num ** 0.5) + 1)):
+            primes.append(num)
+    return random.choice(primes)
+
+def calculate_keys(p, q):
+    n = p * q
+    phi = (p - 1) * (q - 1)
+    
+    while True:
+        e = random.randint(2, phi)
+        if gcd(e, phi) == 1:
+            break
+    
+    _, d, _ = extended_gcd(e, phi)
+    d = d % phi
+    if d < 0:
+        d += phi
+    
+    return n, e, d
+
+def encrypt(message, e, n):
+    return pow(message, e, n)
+
+def decrypt(ciphertext, d, n):
+    return pow(ciphertext, d, n)
+
+p = int(input("Ingrese el primer número primo de 4 dígitos: "))
+q = int(input("Ingrese el segundo número primo de 4 dígitos: "))
+
+n, e, d = calculate_keys(p, q)
+
+print("n:", n)
+print("e:", e)
+print("d:", d)
+
+message = int(input("Ingrese el mensaje a cifrar (como número): "))
+ciphertext = encrypt(message, e, n)
+print("Mensaje cifrado:", ciphertext)
+
+decrypted_message = decrypt(ciphertext, d, n)
+print("Mensaje descifrado:", decrypted_message)
